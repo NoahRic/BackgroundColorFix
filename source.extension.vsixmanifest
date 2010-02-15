@@ -4,7 +4,7 @@
     <Name>Background Color Fix</Name>
     <Author>Noah Richards</Author>
     <Version>0.1</Version>
-    <Description xml:space="preserve">Fix the behavior of text background colors in the editor.</Description>
+    <Description>Fix the behavior of text background colors in the editor in two ways. First, remove the gap in the background color between subsequent lines with the same color. Second, when the background color is at the end of the line, draw the background color to the edge of the view.</Description>
     <Locale>1033</Locale>
     <MoreInfoUrl>http://blogs.msdn.com/noahric</MoreInfoUrl>
     <License>ms-pl.txt</License>
