@@ -24,7 +24,13 @@ namespace BackgroundColorFix
 
         bool _inUpdate = false;
 
-        const bool BETA2 = true;
+        // There's a bug in Visual Studio 2010 RTM that prevents us from using an opacity of 0.0.  To work around
+        // this, we just a value very close to 0.0 for transparent.
+        const double Transparent = 0.00000001;
+
+        // This is the normal background opacity of classification format definitions that are picked up from
+        // the fonts and colors table.
+        const double BackgroundOpacity = 0.8;
 
         public BackgroundColorVisualManager(IWpfTextView view, ITagAggregator<ClassificationTag> aggregator, IClassificationFormatMap formatMap,
                                             IVsFontsAndColorsInformationService fcService, IVsEditorAdaptersFactoryService adaptersService)
@@ -50,12 +56,12 @@ namespace BackgroundColorFix
                     }
                 };
 
-            _view.GotAggregateFocus += GotAggregateFocus;
+            PresentationSource.AddSourceChangedHandler(_view.VisualElement, OnSourceChanged);
         }
 
-        void GotAggregateFocus(object sender, EventArgs e)
+        void OnSourceChanged(object sender, EventArgs e)
         {
-            _view.GotAggregateFocus -= GotAggregateFocus;
+            PresentationSource.RemoveSourceChangedHandler(_view.VisualElement, OnSourceChanged);
 
             var bufferAdapter = _adaptersService.GetBufferAdapter(_view.TextBuffer);
 
@@ -74,7 +80,9 @@ namespace BackgroundColorFix
             if (info == null)
                 return;
 
-            // This is *really* dirty.  Why doesn't IVsFontsAndColorsInformation give you a count?!
+            // This is pretty dirty. IVsFontsAndColorsInformation doesn't give you a count, and I don't really want
+            // to go through the ugly of finding the eventual colorable items provider to ask for its count, so this nasty
+            // little loop will go until an index past the count (at which point it returns null).
             List<IClassificationType> types = new List<IClassificationType>();
 
             for (int i = 1; i < 1000; i++)
@@ -100,7 +108,8 @@ namespace BackgroundColorFix
                     if (type == null)
                         continue;
 
-                    // There are a couple we want to skip, for sure
+                    // There are a couple we want to skip, no matter what.  These are classification types that aren't
+                    // used for text formatting.
                     string name = type.Classification.ToUpperInvariant();
 
                     if (name.Contains("WORD WRAP GLYPH") ||
@@ -113,9 +122,9 @@ namespace BackgroundColorFix
                         continue;
 
                     var solidColorBrush = format.BackgroundBrush as SolidColorBrush;
-                    if (solidColorBrush != null && solidColorBrush.Opacity == 0.5)
+                    if (solidColorBrush != null && solidColorBrush.Opacity == BackgroundOpacity)
                     {
-                        format = format.SetBackgroundBrush(new SolidColorBrush(solidColorBrush.Color) { Opacity = 0.0 });
+                        format = format.SetBackgroundBrush(new SolidColorBrush(solidColorBrush.Color) { Opacity = Transparent });
                         _formatMap.SetTextProperties(type, format);
                     }
                 }
@@ -126,9 +135,6 @@ namespace BackgroundColorFix
             }
         }
 
-        /// <summary>
-        /// On layout change add the adornment to any reformatted lines
-        /// </summary>
         private void OnLayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
         {
             foreach (ITextViewLine line in e.NewOrReformattedLines)
@@ -137,9 +143,6 @@ namespace BackgroundColorFix
             }
         }
 
-        /// <summary>
-        /// Within the given line add the scarlet box behind the a
-        /// </summary>
         private void CreateVisuals(ITextViewLine line)
         {
             foreach (var tagSpan in _aggregator.GetTags(line.Extent))
@@ -152,7 +155,7 @@ namespace BackgroundColorFix
                         continue;
 
                     var solidColorBrush = textProperties.BackgroundBrush as SolidColorBrush;
-                    if (solidColorBrush == null || solidColorBrush.Opacity != 0.0)
+                    if (solidColorBrush == null || solidColorBrush.Opacity != Transparent)
                         continue;
 
                     Brush brush = new SolidColorBrush(solidColorBrush.Color) { Opacity = 1.0 };
@@ -184,7 +187,6 @@ namespace BackgroundColorFix
             Image image = new Image();
             image.Source = drawingImage;
 
-            //Align the image with the top of the bounds of the text geometry
             Canvas.SetLeft(image, geometry.Bounds.Left);
             Canvas.SetTop(image, geometry.Bounds.Top);
 

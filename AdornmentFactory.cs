@@ -16,7 +16,7 @@ namespace BackgroundColorFix
         [Name("BackgroundColorFix")]
         [Order(Before = PredefinedAdornmentLayers.Selection)]
         [TextViewRole(PredefinedTextViewRoles.Document)]
-        AdornmentLayerDefinition editorAdornmentLayer = null;
+        AdornmentLayerDefinition AdornmentLayer = null;
 
         [Import]
         IViewTagAggregatorFactoryService AggregatorService = null;
@@ -24,7 +24,6 @@ namespace BackgroundColorFix
         [Import]
         IClassificationFormatMapService FormatMapService = null;
 
-        // For getting colorable items
         [Import]
         IVsFontsAndColorsInformationService FCService = null;
 
