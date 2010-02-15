@@ -4,7 +4,7 @@
     <Name>Background Color Fix</Name>
     <Author>Noah Richards</Author>
     <Version>0.1</Version>
-    <Description xml:space="preserve">This is a sample text-relative adornment extension to the Visual Studio Editor.</Description>
+    <Description xml:space="preserve">Fix the behavior of background color selection for Fonts and Colors items.</Description>
     <Locale>1033</Locale>
     <MoreInfoUrl>http://blogs.msdn.com/noahric</MoreInfoUrl>
     <License>ms-pl.txt</License>
