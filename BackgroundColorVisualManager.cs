@@ -145,7 +145,7 @@ namespace BackgroundColorFix
 
         private void CreateVisuals(ITextViewLine line)
         {
-            foreach (var tagSpan in _aggregator.GetTags(line.Extent))
+            foreach (var tagSpan in _aggregator.GetTags(line.ExtentAsMappingSpan))
             {
                 foreach (var span in tagSpan.Span.GetSpans(_view.TextSnapshot))
                 {
