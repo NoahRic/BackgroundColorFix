@@ -50,18 +50,19 @@ namespace BackgroundColorFix
 
             _formatMap.ClassificationFormatMappingChanged += (sender, args) =>
                 {
-                    if (!_inUpdate)
+                    if (!_inUpdate && _view != null && !_view.IsClosed)
                     {
-                        FixFormatMap(_formatMap.CurrentPriorityOrder);
+                        _view.VisualElement.Dispatcher.BeginInvoke(new Action(FixFormatMap));
                     }
                 };
 
-            PresentationSource.AddSourceChangedHandler(_view.VisualElement, OnSourceChanged);
+            _view.VisualElement.Dispatcher.BeginInvoke(new Action(FixFormatMap));
         }
 
-        void OnSourceChanged(object sender, EventArgs e)
+        void FixFormatMap()
         {
-            PresentationSource.RemoveSourceChangedHandler(_view.VisualElement, OnSourceChanged);
+            if (_view == null || _view.IsClosed)
+                return;
 
             var bufferAdapter = _adaptersService.GetBufferAdapter(_view.TextBuffer);
 
@@ -83,7 +84,7 @@ namespace BackgroundColorFix
             // This is pretty dirty. IVsFontsAndColorsInformation doesn't give you a count, and I don't really want
             // to go through the ugly of finding the eventual colorable items provider to ask for its count, so this nasty
             // little loop will go until an index past the count (at which point it returns null).
-            List<IClassificationType> types = new List<IClassificationType>();
+            HashSet<IClassificationType> types = new HashSet<IClassificationType>(_formatMap.CurrentPriorityOrder);
 
             for (int i = 1; i < 1000; i++)
             {
@@ -113,7 +114,8 @@ namespace BackgroundColorFix
                     string name = type.Classification.ToUpperInvariant();
 
                     if (name.Contains("WORD WRAP GLYPH") ||
-                        name.Contains("LINE NUMBER"))
+                        name.Contains("LINE NUMBER") ||
+                        name == "STRING")
                         continue;
 
                     var format = _formatMap.GetTextProperties(type);
@@ -128,6 +130,10 @@ namespace BackgroundColorFix
                         _formatMap.SetTextProperties(type, format);
                     }
                 }
+            }
+            catch (Exception)
+            {
+                // Do nothing, just prevent this exception from bringing down the editor.
             }
             finally
             {
