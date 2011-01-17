@@ -1,14 +1,13 @@
+using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Linq;
+using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Formatting;
-using Microsoft.VisualStudio.Text.Classification;
-using System.Collections.Generic;
-using System;
-using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text.Tagging;
 
 namespace BackgroundColorFix
