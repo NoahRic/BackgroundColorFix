@@ -45,7 +45,6 @@ namespace BackgroundColorFix
             _view.LayoutChanged += OnLayoutChanged;
 
             // Here are the hacks for making the normal classification background go away:
-            FixFormatMap(_formatMap.CurrentPriorityOrder);
 
             _formatMap.ClassificationFormatMappingChanged += (sender, args) =>
                 {
