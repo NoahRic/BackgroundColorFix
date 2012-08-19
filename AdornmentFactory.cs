@@ -33,7 +33,7 @@ namespace BackgroundColorFix
         public void TextViewCreated(IWpfTextView textView)
         {
             new BackgroundColorVisualManager(textView, 
-                                             AggregatorService.CreateTagAggregator<ClassificationTag>(textView),
+                                             AggregatorService.CreateTagAggregator<IClassificationTag>(textView),
                                              FormatMapService.GetClassificationFormatMap(textView),
                                              FCService, AdaptersService);
         }

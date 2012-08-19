@@ -16,7 +16,7 @@ namespace BackgroundColorFix
     {
         IAdornmentLayer _layer;
         IWpfTextView _view;
-        ITagAggregator<ClassificationTag> _aggregator;
+        ITagAggregator<IClassificationTag> _aggregator;
         IClassificationFormatMap _formatMap;
         IVsFontsAndColorsInformationService _fcService;
         IVsEditorAdaptersFactoryService _adaptersService;
@@ -31,7 +31,7 @@ namespace BackgroundColorFix
         // the fonts and colors table.
         const double BackgroundOpacity = 0.8;
 
-        public BackgroundColorVisualManager(IWpfTextView view, ITagAggregator<ClassificationTag> aggregator, IClassificationFormatMap formatMap,
+        public BackgroundColorVisualManager(IWpfTextView view, ITagAggregator<IClassificationTag> aggregator, IClassificationFormatMap formatMap,
                                             IVsFontsAndColorsInformationService fcService, IVsEditorAdaptersFactoryService adaptersService)
         {
             _view = view;
